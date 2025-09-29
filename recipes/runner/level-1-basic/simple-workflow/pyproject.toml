@@ -9,7 +9,7 @@ description = "Simple workflow recipe for Arazzo Engine Cookbook"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "arazzo-runner>=1.0.0",
+    "arazzo-runner<=1.0.0",
     "pyyaml>=6.0.0",
     "requests>=2.31.0",
 ]
@@ -19,6 +19,10 @@ dev = [
     "pytest>=7.0.0",
     "pytest-cov>=4.1.0",
 ]
+
+[tool.hatch.build.targets.wheel]
+# Don't try to build a wheel - just install dependencies
+packages = []
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

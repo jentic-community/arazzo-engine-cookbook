@@ -11,7 +11,7 @@ echo ""
 # Example 1: Basic execution with default input
 echo "Example 1: Execute with default input (userId=1)"
 echo "--------------------------------------------------"
-arazzo-runner execute arazzo/workflow.arazzo.yaml \
+arazzo-runner execute-workflow arazzo/workflow.arazzo.yaml \
   --workflow getUserInfo \
   --input '{"userId": 1}'
 echo ""
@@ -20,7 +20,7 @@ echo ""
 # Example 2: Execute with custom user ID
 echo "Example 2: Execute with custom user ID (userId=3)"
 echo "--------------------------------------------------"
-arazzo-runner execute arazzo/workflow.arazzo.yaml \
+arazzo-runner execute-workflow arazzo/workflow.arazzo.yaml \
   --workflow getUserInfo \
   --input '{"userId": 3}'
 echo ""
@@ -29,7 +29,7 @@ echo ""
 # Example 3: Save output to file
 echo "Example 3: Save output to JSON file"
 echo "------------------------------------"
-arazzo-runner execute arazzo/workflow.arazzo.yaml \
+arazzo-runner execute-workflow arazzo/workflow.arazzo.yaml \
   --workflow getUserInfo \
   --input '{"userId": 2}' \
   --output user_2_result.json
@@ -50,7 +50,7 @@ echo ""
 # Example 5: Execute with verbose logging
 echo "Example 5: Execute with verbose logging"
 echo "----------------------------------------"
-arazzo-runner execute arazzo/workflow.arazzo.yaml \
+arazzo-runner execute-workflow arazzo/workflow.arazzo.yaml \
   --workflow getUserInfo \
   --input '{"userId": 1}' \
   --verbose

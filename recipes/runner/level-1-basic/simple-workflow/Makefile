@@ -17,7 +17,7 @@ help: ## Show this help message
 	@echo '${YELLOW}Simple Workflow Recipe${RESET}'
 	@echo ''
 	@echo '${YELLOW}Quick Start:${RESET}'
-	@echo '  ${GREEN}make install${RESET}        - Install dependencies'
+	@echo '  ${GREEN}make setup-recipe${RESET}        - Install dependencies'
 	@echo '  ${GREEN}make run${RESET}            - Execute workflow'
 	@echo '  ${GREEN}make test${RESET}           - Run tests'
 	@echo ''
@@ -25,13 +25,16 @@ help: ## Show this help message
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  ${YELLOW}%-15s${GREEN}%s${RESET}\n", $$1, $$2}' $(MAKEFILE_LIST)
 	@echo ''
 
-.PHONY: install
-install: ## Install recipe dependencies
+
+.PHONY: setup-recipe
+setup-recipe: ## Install recipe dependencies
 	@echo "${BLUE}Installing dependencies...${RESET}"
 	@if command -v uv > /dev/null 2>&1; then \
-	  uv pip install -e . --python $(PYTHON); \
+	  uv pip install arazzo-runner>=1.0.0 pyyaml>=6.0.0 requests>=2.31.0; \
+	  uv pip install pytest>=7.0.0 pytest-cov>=4.1.0; \
 	else \
-	  $(PYTHON) -m pip install -e .; \
+	  $(PYTHON) -m pip install arazzo-runner>=1.0.0 pyyaml>=6.0.0 requests>=2.31.0; \
+	  $(PYTHON) -m pip install pytest>=7.0.0 pytest-cov>=4.1.0; \
 	fi
 	@echo "${GREEN}✓ Dependencies installed${RESET}"
 
@@ -52,9 +55,9 @@ validate: ## Validate workflow specification
 .PHONY: run
 run: ## Execute workflow (use: make run INPUT='{"userId": 2}')
 	@echo "${BLUE}Executing workflow with input: $(INPUT)${RESET}"
-	@$(PYTHON) -m arazzo_runner execute $(ARAZZO_FILE) \
-	  --workflow $(WORKFLOW_ID) \
-	  --input '$(INPUT)'
+	@$(PYTHON) -m arazzo_runner execute-workflow $(ARAZZO_FILE) \
+	  --workflow-id $(WORKFLOW_ID) \
+	  --inputs '$(INPUT)'
 	@echo "${GREEN}✓ Workflow execution completed${RESET}"
 
 .PHONY: run-python

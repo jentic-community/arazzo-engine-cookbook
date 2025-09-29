@@ -157,14 +157,14 @@ print(f"Email: {result.outputs['user']['email']}")
 
 ```bash
 # Basic execution
-arazzo-runner execute arazzo/workflow.arazzo.yaml \
-  --workflow getUserInfo \
-  --input '{"userId": 1}'
+arazzo-runner execute-workflow arazzo/workflow.arazzo.yaml \
+  --workflow-id getUserInfo \
+  --inputs '{"userId": 1}'
 
 # With output file
-arazzo-runner execute arazzo/workflow.arazzo.yaml \
-  --workflow getUserInfo \
-  --input '{"userId": 2}' \
+arazzo-runner execute-workflow arazzo/workflow.arazzo.yaml \
+  --workflow-id getUserInfo \
+  --inputs '{"userId": 2}' \
   --output result.json
 ```
 
