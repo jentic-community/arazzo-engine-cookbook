@@ -1,0 +1,145 @@
+openapi: 3.0.0
+info:
+  title: JSONPlaceholder API
+  version: 1.0.0
+  description: |
+    A free fake REST API for testing and prototyping.
+    This is a subset of the full JSONPlaceholder API focusing on user operations.
+  contact:
+    name: JSONPlaceholder
+    url: https://jsonplaceholder.typicode.com
+
+servers:
+  - url: https://jsonplaceholder.typicode.com
+    description: Main API server
+
+paths:
+  /users/{id}:
+    get:
+      operationId: getUser
+      summary: Get user by ID
+      description: Retrieve details of a specific user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User ID
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 10
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              examples:
+                user1:
+                  summary: Example user 1
+                  value:
+                    id: 1
+                    name: Leanne Graham
+                    username: Bret
+                    email: Sincere@april.biz
+                    phone: 1-770-736-8031 x56442
+                    website: hildegard.org
+                    address:
+                      street: Kulas Light
+                      suite: Apt. 556
+                      city: Gwenborough
+                      zipcode: "92998-3874"
+                      geo:
+                        lat: "-37.3159"
+                        lng: "81.1496"
+                    company:
+                      name: Romaguera-Crona
+                      catchPhrase: Multi-layered client-server neural-net
+                      bs: harness real-time e-markets
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    User:
+      type: object
+      required:
+        - id
+        - name
+        - username
+        - email
+      properties:
+        id:
+          type: integer
+          description: User ID
+          example: 1
+        name:
+          type: string
+          description: Full name
+          example: Leanne Graham
+        username:
+          type: string
+          description: Username
+          example: Bret
+        email:
+          type: string
+          format: email
+          description: Email address
+          example: Sincere@april.biz
+        phone:
+          type: string
+          description: Phone number
+          example: 1-770-736-8031 x56442
+        website:
+          type: string
+          description: Website URL
+          example: hildegard.org
+        address:
+          type: object
+          properties:
+            street:
+              type: string
+              example: Kulas Light
+            suite:
+              type: string
+              example: Apt. 556
+            city:
+              type: string
+              example: Gwenborough
+            zipcode:
+              type: string
+              example: "92998-3874"
+            geo:
+              type: object
+              properties:
+                lat:
+                  type: string
+                  example: "-37.3159"
+                lng:
+                  type: string
+                  example: "81.1496"
+        company:
+          type: object
+          properties:
+            name:
+              type: string
+              example: Romaguera-Crona
+            catchPhrase:
+              type: string
+              example: Multi-layered client-server neural-net
+            bs:
+              type: string
+              example: harness real-time e-markets
+
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message
+          example: User not found

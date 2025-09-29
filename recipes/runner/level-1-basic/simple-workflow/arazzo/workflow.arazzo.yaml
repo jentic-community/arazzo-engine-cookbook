@@ -1,0 +1,54 @@
+arazzo: "1.0.0"
+info:
+  title: Simple User Fetch Workflow
+  version: 1.0.0
+  description: |
+    A simple workflow demonstrating basic Arazzo concepts by fetching
+    user information from the JSONPlaceholder test API.
+
+sourceDescriptions:
+  - name: jsonPlaceholderAPI
+    url: ./openapi/jsonplaceholder.openapi.yaml
+    type: openapi
+
+workflows:
+  - workflowId: getUserInfo
+    summary: Fetch user information by ID
+    description: |
+      This workflow demonstrates the basic structure of an Arazzo workflow.
+      It takes a user ID as input and fetches the corresponding user data
+      from the JSONPlaceholder API.
+    
+    inputs:
+      type: object
+      properties:
+        userId:
+          type: integer
+          description: The ID of the user to fetch (1-10)
+          default: 1
+          minimum: 1
+          maximum: 10
+    
+    steps:
+      - stepId: fetchUser
+        description: Fetch user details from the API
+        operationId: getUser
+        parameters:
+          - name: id
+            in: path
+            value: $inputs.userId
+        successCriteria:
+          - condition: $statusCode == 200
+            type: simple
+        outputs:
+          userId: $response.body.id
+          username: $response.body.username
+          email: $response.body.email
+          name: $response.body.name
+          phone: $response.body.phone
+          website: $response.body.website
+    
+    outputs:
+      user:
+        value: $steps.fetchUser.outputs
+        description: Complete user information object

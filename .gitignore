@@ -205,3 +205,48 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Arazzo-specific additions
+
+# Arazzo execution artifacts
+execution_results.json
+**/execution_results.json
+workflow_outputs/
+**/workflow_outputs/
+
+# Recipe-specific outputs
+recipes/**/output/
+recipes/**/logs/
+recipes/**/*.log
+
+# API response caches (if recipes cache responses)
+.api_cache/
+**/.api_cache/
+
+# Temporary workflow files
+*.arazzo.tmp
+*.openapi.tmp
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Linux
+*~
+.directory
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Editor backups
+*.swp
+*.swo
+*~
+.#*
+
+# Test artifacts specific to recipes
+recipes/**/test_results/
+recipes/**/.pytest_cache/
