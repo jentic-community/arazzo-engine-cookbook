@@ -1,0 +1,177 @@
+openapi: 3.0.0
+info:
+  title: JSONPlaceholder API
+  version: 1.0.0
+  description: |
+    Free fake REST API for testing and prototyping.
+    Extended specification including users, posts, and comments endpoints.
+
+servers:
+  - url: https://jsonplaceholder.typicode.com
+    description: Main API server
+
+paths:
+  /users/{id}:
+    get:
+      operationId: getUser
+      summary: Get user by ID
+      description: Retrieve details of a specific user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User ID
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 10
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+
+  /posts:
+    get:
+      operationId: getUserPosts
+      summary: Get posts by user
+      description: Retrieve all posts for a specific user
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          description: User ID to filter posts
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
+
+  /comments:
+    get:
+      operationId: getPostComments
+      summary: Get comments by post
+      description: Retrieve all comments for a specific post
+      parameters:
+        - name: postId
+          in: query
+          required: true
+          description: Post ID to filter comments
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+
+components:
+  schemas:
+    User:
+      type: object
+      required:
+        - id
+        - name
+        - username
+        - email
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Leanne Graham
+        username:
+          type: string
+          example: Bret
+        email:
+          type: string
+          format: email
+          example: Sincere@april.biz
+        phone:
+          type: string
+          example: 1-770-736-8031 x56442
+        website:
+          type: string
+          example: hildegard.org
+        address:
+          type: object
+          properties:
+            street:
+              type: string
+            suite:
+              type: string
+            city:
+              type: string
+            zipcode:
+              type: string
+        company:
+          type: object
+          properties:
+            name:
+              type: string
+            catchPhrase:
+              type: string
+
+    Post:
+      type: object
+      required:
+        - id
+        - userId
+        - title
+        - body
+      properties:
+        id:
+          type: integer
+          example: 1
+        userId:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: "sunt aut facere repellat provident"
+        body:
+          type: string
+          example: "quia et suscipit\nsuscipit..."
+
+    Comment:
+      type: object
+      required:
+        - id
+        - postId
+        - name
+        - email
+        - body
+      properties:
+        id:
+          type: integer
+          example: 1
+        postId:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "id labore ex et quam laborum"
+        email:
+          type: string
+          format: email
+          example: Eliseo@gardner.biz
+        body:
+          type: string
+          example: "laudantium enim quasi est quidem..."

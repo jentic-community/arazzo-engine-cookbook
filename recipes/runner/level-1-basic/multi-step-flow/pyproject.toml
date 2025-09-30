@@ -1,0 +1,27 @@
+[build-system]
+requires = ["hatchling>=1.18.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "arazzo-recipe-multi-step-flow"
+version = "0.1.0"
+description = "Multi-step workflow recipe demonstrating data passing between steps"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "arazzo-runner>=1.0.0",
+    "pyyaml>=6.0.0",
+    "requests>=2.31.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.1.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+addopts = ["-v"]

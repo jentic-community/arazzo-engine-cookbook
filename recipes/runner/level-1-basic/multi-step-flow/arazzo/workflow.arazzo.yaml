@@ -1,0 +1,101 @@
+arazzo: "1.0.0"
+info:
+  title: Multi-Step User Content Workflow
+  version: 1.0.0
+  description: |
+    Demonstrates chaining multiple API calls together with data passing between steps.
+    
+    This workflow:
+    1. Fetches user information
+    2. Retrieves all posts by that user
+    3. Gets comments for the user's first post
+    
+    Each step depends on data from the previous step, showing how to build
+    complex workflows from simple operations.
+
+sourceDescriptions:
+  - name: jsonPlaceholderAPI
+    url: ./openapi/jsonplaceholder.openapi.yaml
+    type: openapi
+
+workflows:
+  - workflowId: getUserContent
+    summary: Fetch user and their content
+    description: |
+      Multi-step workflow that demonstrates data passing between steps.
+      Fetches a user, their posts, and comments on their first post.
+    
+    inputs:
+      type: object
+      properties:
+        userId:
+          type: integer
+          description: The ID of the user to fetch (1-10)
+          default: 1
+          minimum: 1
+          maximum: 10
+      required:
+        - userId
+    
+    steps:
+      # Step 1: Get user information
+      - stepId: fetchUser
+        description: Fetch basic user information
+        operationId: getUser
+        parameters:
+          - name: id
+            in: path
+            value: $inputs.userId
+        successCriteria:
+          - condition: $statusCode == 200
+            type: simple
+        outputs:
+          userId: $response.body.id
+          username: $response.body.username
+          name: $response.body.name
+          email: $response.body.email
+      
+      # Step 2: Get all posts by this user
+      - stepId: fetchPosts
+        description: Fetch all posts by the user
+        operationId: getUserPosts
+        parameters:
+          - name: userId
+            in: query
+            value: $steps.fetchUser.outputs.userId  # Use output from Step 1
+        successCriteria:
+          - condition: $statusCode == 200
+            type: simple
+        outputs:
+          posts: $response.body
+          postCount: $response.body.length
+          firstPostId: $response.body[0].id
+          firstPostTitle: $response.body[0].title
+      
+      # Step 3: Get comments for the first post
+      - stepId: fetchComments
+        description: Fetch comments for the user's first post
+        operationId: getPostComments
+        parameters:
+          - name: postId
+            in: query
+            value: $steps.fetchPosts.outputs.firstPostId  # Use output from Step 2
+        successCriteria:
+          - condition: $statusCode == 200
+            type: simple
+        outputs:
+          comments: $response.body
+          commentCount: $response.body.length
+          firstCommentEmail: $response.body[0].email
+    
+    # Final workflow outputs combine data from all steps
+    outputs:
+      summary:
+        value: |
+          {
+            "username": "$steps.fetchUser.outputs.username",
+            "postCount": $steps.fetchPosts.outputs.postCount,
+            "firstPostTitle": "$steps.fetchPosts.outputs.firstPostTitle",
+            "firstPostCommentCount": $steps.fetchComments.outputs.commentCount
+          }
+        description: Summary of user content
