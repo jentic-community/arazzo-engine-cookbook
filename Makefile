@@ -1,3 +1,4 @@
+# arazzo-engine-cookbook/Makefile (root project)
 # Terminal colors
 GREEN  := $(shell tput -Txterm setaf 2)
 YELLOW := $(shell tput -Txterm setaf 3)

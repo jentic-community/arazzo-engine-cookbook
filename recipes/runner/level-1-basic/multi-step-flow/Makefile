@@ -7,7 +7,22 @@ RED    := $(shell tput -Txterm setaf 1)
 
 # Project settings
 RECIPE_NAME := multi-step-flow
-PYTHON := python3
+
+# Detect Python from virtual environment or fall back to system Python
+# First, try to find the root venv (4 levels up from recipe directory)
+REPO_ROOT := $(shell cd ../../../.. && pwd)
+VENV_PYTHON := $(REPO_ROOT)/.venv/bin/python
+
+# Check if venv Python exists, otherwise fall back to system Python
+ifeq ($(shell test -f $(VENV_PYTHON) && echo yes),yes)
+    PYTHON := $(VENV_PYTHON)
+    $(info Using virtual environment Python: $(PYTHON))
+else
+    PYTHON := python3
+    $(warning Virtual environment not found at $(VENV_PYTHON), using system Python)
+    $(warning Run 'make setup' from the repository root first)
+endif
+
 ARAZZO_FILE := arazzo/workflow.arazzo.yaml
 WORKFLOW_ID := getUserContent
 INPUT ?= {"userId": 1}
@@ -25,33 +40,37 @@ help: ## Show this help message
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  ${YELLOW}%-15s${GREEN}%s${RESET}\n", $$1, $$2}' $(MAKEFILE_LIST)
 	@echo ''
 
-.PHONY: install
-install: ## Install recipe dependencies
-	@echo "${BLUE}Installing dependencies...${RESET}"
-	@if command -v uv > /dev/null 2>&1; then \
-	  uv pip install arazzo-runner>=1.0.0 pyyaml>=6.0.0 requests>=2.31.0; \
-	  uv pip install pytest>=7.0.0 pytest-cov>=4.1.0; \
-	else \
-	  $(PYTHON) -m pip install arazzo-runner>=1.0.0 pyyaml>=6.0.0 requests>=2.31.0; \
-	  $(PYTHON) -m pip install pytest>=7.0.0 pytest-cov>=4.1.0; \
+.PHONY: check-venv
+check-venv: ## Check if virtual environment is available
+	@if [ ! -f "$(VENV_PYTHON)" ]; then \
+	  echo "${RED}Error: Virtual environment not found${RESET}"; \
+	  echo "Expected location: $(VENV_PYTHON)"; \
+	  echo ""; \
+	  echo "${YELLOW}Please run from the repository root:${RESET}"; \
+	  echo "  ${GREEN}cd $(REPO_ROOT)${RESET}"; \
+	  echo "  ${GREEN}make setup${RESET}"; \
+	  echo ""; \
+	  exit 1; \
 	fi
-	@echo "${GREEN}✓ Dependencies installed${RESET}"
+	@echo "${GREEN}✓ Virtual environment found${RESET}"
 
 .PHONY: check
-check: ## Verify setup
+check: check-venv ## Verify setup
 	@echo "${BLUE}Checking setup...${RESET}"
+	@echo "Python: $(PYTHON)"
 	@$(PYTHON) --version
-	@$(PYTHON) -c "import arazzo_runner; print('✓ arazzo-runner installed')"
+	@$(PYTHON) -c "import arazzo_runner; print('✓ arazzo-runner installed')" || \
+	  (echo "${RED}✗ arazzo-runner not found - run 'make install'${RESET}" && exit 1)
 	@test -f $(ARAZZO_FILE) && echo "✓ Workflow file exists" || echo "✗ Workflow file missing"
 	@echo "${GREEN}✓ Setup verified${RESET}"
 
 .PHONY: validate
-validate: ## Validate workflow specification
+validate: check-venv ## Validate workflow specification
 	@echo "${BLUE}Validating workflow...${RESET}"
 	@$(PYTHON) -c "import yaml; yaml.safe_load(open('$(ARAZZO_FILE)'))" && echo "${GREEN}✓ Workflow YAML is valid${RESET}"
 
 .PHONY: run
-run: ## Execute workflow (use: make run INPUT='{"userId": 2}')
+run: check-venv ## Execute workflow (use: make run INPUT='{"userId": 2}')
 	@echo "${BLUE}Executing workflow with input: $(INPUT)${RESET}"
 	@$(PYTHON) -m arazzo_runner execute-workflow $(ARAZZO_FILE) \
 	  --workflow-id $(WORKFLOW_ID) \
@@ -59,13 +78,13 @@ run: ## Execute workflow (use: make run INPUT='{"userId": 2}')
 	@echo "${GREEN}✓ Workflow execution completed${RESET}"
 
 .PHONY: run-python
-run-python: ## Execute workflow using Python script
+run-python: check-venv ## Execute workflow using Python script
 	@echo "${BLUE}Running Python example...${RESET}"
 	@$(PYTHON) examples/basic_example.py
 	@echo "${GREEN}✓ Python example completed${RESET}"
 
 .PHONY: run-all-users
-run-all-users: ## Execute workflow for multiple users
+run-all-users: check-venv ## Execute workflow for multiple users
 	@echo "${BLUE}Fetching content for multiple users...${RESET}"
 	@for i in 1 2 3; do \
 	  echo ""; \
@@ -75,13 +94,13 @@ run-all-users: ## Execute workflow for multiple users
 	@echo "${GREEN}✓ All users processed${RESET}"
 
 .PHONY: test
-test: ## Run workflow tests
+test: check-venv ## Run workflow tests
 	@echo "${BLUE}Running tests...${RESET}"
 	@$(PYTHON) -m pytest tests/ -v
 	@echo "${GREEN}✓ Tests completed${RESET}"
 
 .PHONY: test-coverage
-test-coverage: ## Run tests with coverage
+test-coverage: check-venv ## Run tests with coverage
 	@echo "${BLUE}Running tests with coverage...${RESET}"
 	@$(PYTHON) -m pytest tests/ -v --cov=. --cov-report=term-missing
 	@echo "${GREEN}✓ Tests with coverage completed${RESET}"

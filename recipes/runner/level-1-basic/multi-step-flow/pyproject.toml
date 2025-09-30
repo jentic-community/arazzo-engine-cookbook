@@ -9,7 +9,7 @@ description = "Multi-step workflow recipe demonstrating data passing between ste
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "arazzo-runner>=1.0.0",
+    "arazzo-runner<=1.0.0",
     "pyyaml>=6.0.0",
     "requests>=2.31.0",
 ]

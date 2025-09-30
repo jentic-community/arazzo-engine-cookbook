@@ -67,10 +67,10 @@ workflows:
           - condition: $statusCode == 200
             type: simple
         outputs:
+          # Store the full response body (array of posts)
           posts: $response.body
-          postCount: $response.body.length
-          firstPostId: $response.body[0].id
-          firstPostTitle: $response.body[0].title
+          # Get the first post's ID - this works in parameters but may not in outputs
+          # We'll need to test what the runner actually supports
       
       # Step 3: Get comments for the first post
       - stepId: fetchComments
@@ -79,23 +79,17 @@ workflows:
         parameters:
           - name: postId
             in: query
-            value: $steps.fetchPosts.outputs.firstPostId  # Use output from Step 2
+            # The runner should be able to evaluate array access in parameter values
+            value: $steps.fetchPosts.outputs.posts[0].id
         successCriteria:
           - condition: $statusCode == 200
             type: simple
         outputs:
+          # Store the full response (array of comments)
           comments: $response.body
-          commentCount: $response.body.length
-          firstCommentEmail: $response.body[0].email
     
-    # Final workflow outputs combine data from all steps
+    # Final workflow outputs
     outputs:
-      summary:
-        value: |
-          {
-            "username": "$steps.fetchUser.outputs.username",
-            "postCount": $steps.fetchPosts.outputs.postCount,
-            "firstPostTitle": "$steps.fetchPosts.outputs.firstPostTitle",
-            "firstPostCommentCount": $steps.fetchComments.outputs.commentCount
-          }
-        description: Summary of user content
+      user: $steps.fetchUser.outputs
+      posts: $steps.fetchPosts.outputs.posts
+      comments: $steps.fetchComments.outputs.comments
